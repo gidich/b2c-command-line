@@ -34,6 +34,7 @@ const requestToken  =  async  (tenant:string, clientId:string, clientSecret:stri
 }
 
 // https://learn.microsoft.com/en-us/graph/auth-v2-service?context=graph%2Fapi%2F1.0&view=graph-rest-1.0&tabs=curl#5-use-the-access-token-to-call-microsoft-graph
+//https://learn.microsoft.com/en-us/graph/extensibility-overview?tabs=javascript#retrieve-a-directory-extension
 const listUsers = async (token: TokenResponse) => {
     const result = await fetch('https://graph.microsoft.com/beta/users', {
         method: 'GET',
@@ -65,7 +66,6 @@ const addExtensionAttributeToUser = (userSpec: UserSpecification, extensionAppId
     return userSpec;
 }
 
-
 const createUserSpecification = (displayName: string,  password: string, emailAddress:string) => {
     const userSpecification: UserSpecification = {
         accountEnabled: true,
@@ -95,7 +95,6 @@ const addUser = async (token: TokenResponse, userSpecification: UserSpecificatio
     });
     return result.json();
 }
-
 
 const addApplicant = async(token:TokenResponse) => {
     if(!process.env.EXTENSION_APP_ID) throw new Error('EXTENSION_APP_ID not set')
@@ -151,7 +150,6 @@ const handleInput = async (input: string, rl:ReadLine, token:TokenResponse) => {
         case 'add-applicant':
             console.log(chalk.green('add-applicant'));
             await addApplicant(token);
-
             break;
         case 'add-entity':
             console.log(chalk.green('add-entity'));
@@ -166,8 +164,6 @@ const handleInput = async (input: string, rl:ReadLine, token:TokenResponse) => {
             break;
     }
 }
-
-
 
 const main = async () => {
     console.clear();
