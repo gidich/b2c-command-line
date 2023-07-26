@@ -1,3 +1,10 @@
+To start the project:
+```bash
+npm install
+npm run dev
+```
+
+
 npm init
 npx tsc --init
 git init .
