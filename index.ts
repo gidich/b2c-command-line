@@ -66,7 +66,6 @@ const addExtensionAttributeToUser = (userSpec: UserSpecification, extensionAppId
 }
 
 
-
 const createUserSpecification = (displayName: string,  password: string, emailAddress:string) => {
     const userSpecification: UserSpecification = {
         accountEnabled: true,
@@ -84,8 +83,6 @@ const createUserSpecification = (displayName: string,  password: string, emailAd
     }
     return userSpecification;
 }
-
-
 
 const addUser = async (token: TokenResponse, userSpecification: UserSpecification) => {
     const result = await fetch('https://graph.microsoft.com/v1.0/users', {
@@ -108,7 +105,6 @@ const addApplicant = async(token:TokenResponse) => {
     const applicant = createUserSpecification(applicantName, applicantPassword, applicantEmail);
     let applicantWithExtension = addExtensionAttributeToUser(applicant, process.env.EXTENSION_APP_ID, 'accountType', 'Applicant');
     applicantWithExtension = addExtensionAttributeToUser(applicantWithExtension, process.env.EXTENSION_APP_ID, 'migrationRequired', 'true');
-
     console.log(chalk.blue(JSON.stringify(applicantWithExtension)));
     const result = await addUser(token, applicantWithExtension);
     console.log(chalk.green(JSON.stringify(result)));
@@ -120,9 +116,8 @@ const addEntity = async(token:TokenResponse) => {
     const email = await askQuestion(' Email: ');
     const entityName = await askQuestion('Entity Name: ');
     const entityId = await askQuestion('Entity Id: ');
-
-    const entityPassword = await askQuestion('Entity Password: ');
-    const entity = createUserSpecification(name, entityPassword, email);
+    const password = await askQuestion('Password: ');
+    const entity = createUserSpecification(name, password, email);
     let entityWithExtension = addExtensionAttributeToUser(entity, process.env.EXTENSION_APP_ID, 'accountType', 'Entity');
     entityWithExtension = addExtensionAttributeToUser(entityWithExtension, process.env.EXTENSION_APP_ID, 'migrationRequired', 'true');
     entityWithExtension = addExtensionAttributeToUser(entityWithExtension, process.env.EXTENSION_APP_ID, 'entityName', entityName);
@@ -139,8 +134,6 @@ const askQuestion = async (question: string) => {
         });
     });
 }
-
-
 
 const handleInput = async (input: string, rl:ReadLine, token:TokenResponse) => {
     switch (input.trim()) {
@@ -185,8 +178,6 @@ const main = async () => {
     if(!process.env.CLIENT_ID) throw new Error('CLIENT_ID not set')
     if(!process.env.CLIENT_SECRET) throw new Error('CLIENT_SECRET not set')
     
-
-
     const token = await requestToken(process.env.TENANT_ID, process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
     rl.setPrompt('ready> ');
