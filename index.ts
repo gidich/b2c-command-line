@@ -96,6 +96,19 @@ const addUser = async (token: TokenResponse, userSpecification: UserSpecificatio
     return result.json();
 }
 
+const updateUser = async (token: TokenResponse, userSpecification: any) => {
+    const result = await fetch(`https://graph.microsoft.com/v1.0/users/${userSpecification.userPrincipalName}`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `${token.token_type} ${token.access_token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userSpecification)
+    });
+    return (result.status === 204) ? {success: true} : {success: false};
+}
+
+
 const addApplicant = async(token:TokenResponse) => {
     if(!process.env.EXTENSION_APP_ID) throw new Error('EXTENSION_APP_ID not set')
     const applicantName = await askQuestion(' Name: ');
@@ -123,6 +136,19 @@ const addEntity = async(token:TokenResponse) => {
     entityWithExtension = addExtensionAttributeToUser(entityWithExtension, process.env.EXTENSION_APP_ID, 'entityId', entityId);
     console.log(chalk.blue(JSON.stringify(entityWithExtension)));
     const result = await addUser(token, entityWithExtension);
+    console.log(chalk.green(JSON.stringify(result)));
+}
+
+const updateApplicant = async(token:TokenResponse) => {
+    if(!process.env.EXTENSION_APP_ID) throw new Error('EXTENSION_APP_ID not set')
+    const upn = await askQuestion(' UPN: ');
+    const name = await askQuestion('New Name: ');
+    const applicant = {
+        userPrincipalName: upn,
+        displayName: name
+    }
+    console.log(chalk.blue(JSON.stringify(applicant)));
+    const result = await updateUser(token, applicant);
     console.log(chalk.green(JSON.stringify(result)));
 }
 
@@ -154,6 +180,10 @@ const handleInput = async (input: string, rl:ReadLine, token:TokenResponse) => {
         case 'add-entity':
             console.log(chalk.green('add-entity'));
             await addEntity(token);
+            break;
+        case 'update-applicant':
+            console.log(chalk.green('update'));
+            await updateApplicant(token);
             break;
         case 'quit':
             console.log(chalk.green('quit'));
